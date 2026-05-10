@@ -50,7 +50,7 @@ export default function InvoicesPage() {
 
   function updateItem(idx: number, field: string, value: string | number) {
     const items = [...form.items];
-    items[idx] = { ...items[idx], [field]: value };
+    items[idx] = { ...items[idx], [field]: value } as (typeof form.items)[number];
     if (field === "qty" || field === "price") items[idx].total = items[idx].qty * items[idx].price;
     const calc = recalc(items);
     setForm({ ...form, items, ...calc });
