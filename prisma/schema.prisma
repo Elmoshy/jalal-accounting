@@ -1,0 +1,253 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Location {
+  id         String   @id @default(cuid())
+  name       String   @unique
+  governorate String
+  address    String?
+  phone      String?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  users      User[]
+  employees  Employee[]
+  suppliers  Supplier[]
+  projects   Project[]
+  inventories Inventory[]
+  custodies  Custody[]
+  expenses   Expense[]
+  invoices   Invoice[]
+  salaries   Salary[]
+}
+
+model User {
+  id         String   @id @default(cuid())
+  name       String
+  email      String   @unique
+  password   String
+  role       String   @default("accountant") // super_admin | city_admin | accountant | viewer
+  isActive   Boolean  @default(true)
+  locationId String?
+  location   Location? @relation(fields: [locationId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  expenses   Expense[]
+  salaries   Salary[]
+  inventoryTx InventoryTransaction[]
+
+  @@index([locationId])
+  @@index([role])
+}
+
+model Employee {
+  id         String   @id @default(cuid())
+  name       String
+  phone      String?
+  position   String?
+  baseSalary Float?
+  hireDate   DateTime @default(now())
+  isActive   Boolean  @default(true)
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  salaries   Salary[]
+  custodies  Custody[]
+
+  @@index([locationId])
+  @@index([name])
+}
+
+model Supplier {
+  id         String   @id @default(cuid())
+  name       String
+  phone      String?
+  address    String?
+  taxId      String?
+  isActive   Boolean  @default(true)
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  invoices   Invoice[]
+
+  @@index([locationId])
+  @@index([name])
+}
+
+model Project {
+  id         String   @id @default(cuid())
+  name       String
+  location   String?
+  startDate  DateTime?
+  endDate    DateTime?
+  status     String   @default("active") // active | completed | cancelled
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  invoices   Invoice[]
+
+  @@index([locationId])
+  @@index([status])
+}
+
+model Inventory {
+  id         String   @id @default(cuid())
+  itemCode   String
+  itemName   String
+  category   String?
+  unit       String   @default("piece")
+  qty        Float    @default(0)
+  unitPrice  Float    @default(0)
+  minQty     Float?   @default(0)
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  transactions InventoryTransaction[]
+
+  @@unique([itemCode, locationId])
+  @@index([locationId])
+  @@index([category])
+  @@index([itemCode])
+}
+
+model InventoryTransaction {
+  id          String   @id @default(cuid())
+  type        String   // IN | OUT
+  qty         Float
+  unitPrice   Float?
+  refType     String?  // invoice | adjustment | transfer
+  refId       String?
+  notes       String?
+  date        DateTime @default(now())
+  inventoryId String
+  inventory   Inventory @relation(fields: [inventoryId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  locationId  String
+  createdAt   DateTime @default(now())
+
+  @@index([inventoryId])
+  @@index([date])
+  @@index([locationId])
+}
+
+model Custody {
+  id           String   @id @default(cuid())
+  itemName     String
+  qty          Float    @default(1)
+  value        Float?
+  dateAssigned DateTime @default(now())
+  dateReturned DateTime?
+  status       String   @default("active") // active | returned | lost
+  notes        String?
+  employeeId   String
+  employee     Employee @relation(fields: [employeeId], references: [id])
+  locationId   String
+  location     Location @relation(fields: [locationId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([employeeId])
+  @@index([status])
+  @@index([locationId])
+}
+
+model Salary {
+  id         String   @id @default(cuid())
+  month      Int      // 1-12
+  year       Int
+  base       Float    @default(0)
+  bonuses    Float    @default(0)
+  deductions Float    @default(0)
+  net        Float    @default(0)
+  paidDate   DateTime @default(now())
+  notes      String?
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id])
+  createdAt  DateTime @default(now())
+
+  @@unique([employeeId, month, year])
+  @@index([employeeId])
+  @@index([locationId])
+  @@index([year, month])
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  category    String   // petty_cash | transport | office | utilities | maintenance | other
+  amount      Float
+  description String
+  date        DateTime @default(now())
+  receiptNo   String?
+  notes       String?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  locationId  String
+  location    Location @relation(fields: [locationId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@index([category])
+  @@index([date])
+  @@index([locationId])
+}
+
+model Invoice {
+  id         String   @id @default(cuid())
+  invNo      String
+  date       DateTime @default(now())
+  subtotal   Float    @default(0)
+  tax        Float    @default(0)
+  total      Float    @default(0)
+  notes      String?
+  supplierId String
+  supplier   Supplier @relation(fields: [supplierId], references: [id])
+  projectId  String?
+  project    Project? @relation(fields: [projectId], references: [id])
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id])
+  userId     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  items InvoiceItem[]
+
+  @@unique([invNo, locationId])
+  @@index([supplierId])
+  @@index([date])
+  @@index([locationId])
+}
+
+model InvoiceItem {
+  id        String  @id @default(cuid())
+  code      String
+  name      String
+  qty       Float
+  unit      String  @default("piece")
+  price     Float
+  total     Float
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@index([code])
+}
