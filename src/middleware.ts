@@ -9,11 +9,15 @@ export default withAuth(
     // Allow API auth routes
     if (path.startsWith("/api/auth")) return NextResponse.next();
 
-    // Role-based route protection
-    if (path.startsWith("/api/locations") || path.startsWith("/api/users")) {
-      if (token?.role !== "super_admin") {
+    // API routes: return JSON instead of redirect
+    if (path.startsWith("/api/")) {
+      if (!token) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      if ((path.startsWith("/api/locations") || path.startsWith("/api/users")) && token.role !== "super_admin") {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
+      return NextResponse.next();
     }
 
     return NextResponse.next();
@@ -22,9 +26,8 @@ export default withAuth(
     callbacks: {
       authorized({ token, req }) {
         const path = req.nextUrl.pathname;
-        // Allow login page and auth APIs
         if (path.startsWith("/login") || path.startsWith("/api/auth")) return true;
-        // Protect all other routes
+        if (path.startsWith("/api/")) return true; // Let middleware handle API JSON responses
         return !!token;
       },
     },
@@ -33,5 +36,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|images|icon.svg).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|images|icon.svg|icon-dark|icon-light|apple-icon|placeholder).*)"],
 };

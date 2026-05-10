@@ -5,6 +5,6 @@ import PlaceholderPage from "../placeholder";
 
 export default async function Page() {
   const session = await getServerSession(authOptions);
-  if ((session?.user as any)?.role !== "super_admin") redirect("/dashboard");
+  if (session?.user?.role !== "super_admin") redirect("/dashboard");
   return <PlaceholderPage title="إدارة المدن" />;
 }

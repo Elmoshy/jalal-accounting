@@ -1,10 +1,32 @@
+import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { hash } from "bcryptjs";
+import pg from "pg";
 
-const prisma = new PrismaClient();
+function parseDbUrl(url: string) {
+  const u = new URL(url);
+  return {
+    host: u.hostname,
+    port: parseInt(u.port || "5432"),
+    database: u.pathname.slice(1),
+    user: decodeURIComponent(u.username),
+    password: decodeURIComponent(u.password),
+    ssl: { rejectUnauthorized: false },
+    connectionTimeoutMillis: 10000,
+  };
+}
+
+const pool = new pg.Pool(parseDbUrl(process.env.DATABASE_URL!));
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
+
+const DEFAULT_PASSWORD = "00000";
 
 async function main() {
   console.log("🌱 Seeding database...");
+
+  const hashedPassword = await hash(DEFAULT_PASSWORD, 12);
 
   // Create locations (Egyptian cities)
   const cairo = await prisma.location.upsert({
@@ -38,20 +60,18 @@ async function main() {
   });
 
   // Create admin user
-  const adminPassword = await hash("admin123", 12);
   await prisma.user.upsert({
     where: { email: "admin@jalal-eg.com" },
     update: {},
     create: {
       name: "المدير العام",
       email: "admin@jalal-eg.com",
-      password: adminPassword,
+      password: hashedPassword,
       role: "super_admin",
     },
   });
 
   // Create city admin for each location
-  const cityPass = await hash("city123", 12);
   const cities = [cairo, alex, hurghada, sharm, marsa];
   for (const city of cities) {
     await prisma.user.upsert({
@@ -60,7 +80,7 @@ async function main() {
       create: {
         name: `مدير ${city.name}`,
         email: `admin-${city.name}@jalal-eg.com`,
-        password: cityPass,
+        password: hashedPassword,
         role: "city_admin",
         locationId: city.id,
       },
@@ -107,7 +127,7 @@ async function main() {
     }
   }
 
-  console.log("✅ Seed completed successfully");
+  console.log(`✅ Seed completed. Default password for all users: ${DEFAULT_PASSWORD}`);
 }
 
 main()

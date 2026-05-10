@@ -8,8 +8,8 @@ export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/login");
 
-  const isAdmin = (session.user as any).role === "super_admin";
-  const locationId = (session.user as any).locationId;
+  const { role, locationId } = session.user;
+  const isAdmin = role === "super_admin";
 
   const locationFilter = isAdmin ? {} : { locationId };
 

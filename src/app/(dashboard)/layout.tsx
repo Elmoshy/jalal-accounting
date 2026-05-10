@@ -2,7 +2,7 @@
 
 import { useSession, signOut } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import {
@@ -18,8 +18,9 @@ import {
   LogOut,
   Sun,
   Moon,
-  ChevronDown,
+  KeyRound,
 } from "lucide-react";
+import { ChangePasswordDialog } from "@/components/shared/change-password-dialog";
 
 const navItems = [
   { href: "/dashboard", label: "لوحة التحكم", icon: LayoutDashboard, roles: ["super_admin", "city_admin", "accountant", "viewer"] },
@@ -40,6 +41,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -98,6 +100,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setPasswordDialogOpen(true)}
+              className="flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-sidebar-accent/50 transition-colors"
+              title="تغيير كلمة المرور"
+            >
+              <KeyRound className="h-4 w-4" />
+            </button>
+            <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               className="flex-1 flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-sidebar-accent/50 transition-colors"
             >
@@ -107,11 +116,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <button
               onClick={() => signOut({ callbackUrl: "/login" })}
               className="flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-destructive/10 hover:text-destructive transition-colors"
+              title="تسجيل الخروج"
             >
               <LogOut className="h-4 w-4" />
             </button>
           </div>
         </div>
+
+        <ChangePasswordDialog open={passwordDialogOpen} onClose={() => setPasswordDialogOpen(false)} />
       </aside>
 
       <main className="mr-64 flex-1 p-6">
