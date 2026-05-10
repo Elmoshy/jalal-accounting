@@ -48,7 +48,7 @@ export default function UsersPage() {
   async function handleEdit(e: React.FormEvent) {
     e.preventDefault();
     if (!editing) return;
-    const body = { ...editForm };
+    const body = { ...editForm } as Record<string, unknown>;
     if (!body.password) delete body.password;
     const res = await fetch(`/api/users/${editing.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     if (res.ok) { setDialogOpen(false); setEditing(null); fetchData(); }
