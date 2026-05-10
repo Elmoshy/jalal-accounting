@@ -25,6 +25,9 @@ model Location {
   expenses   Expense[]
   invoices   Invoice[]
   salaries   Salary[]
+  vacations  Vacation[]
+  attendances Attendance[]
+  loans      Loan[]
 }
 
 model User {
@@ -62,6 +65,9 @@ model Employee {
 
   salaries   Salary[]
   custodies  Custody[]
+  vacations  Vacation[]
+  attendances Attendance[]
+  loans      Loan[]
 
   @@index([locationId])
   @@index([name])
@@ -161,6 +167,69 @@ model Custody {
   location     Location @relation(fields: [locationId], references: [id])
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  @@index([employeeId])
+  @@index([status])
+  @@index([locationId])
+}
+
+model Vacation {
+  id         String   @id @default(cuid())
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  type       String   // annual | sick | emergency | pilgrimage | marriage | maternity | unpaid
+  startDate  DateTime
+  endDate    DateTime
+  days       Int
+  status     String   @default("pending") // pending | approved | rejected
+  notes      String?
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([employeeId])
+  @@index([locationId])
+  @@index([type])
+}
+
+model Attendance {
+  id         String   @id @default(cuid())
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  date       DateTime
+  checkIn    DateTime?
+  checkOut   DateTime?
+  status     String   @default("present") // present | absent | late | vacation
+  overtimeHours Float  @default(0)
+  notes      String?
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([employeeId, date])
+  @@index([employeeId])
+  @@index([date])
+  @@index([locationId])
+}
+
+model Loan {
+  id         String   @id @default(cuid())
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  amount     Float
+  installments Int    @default(1)
+  installmentAmount Float
+  paidAmount Float    @default(0)
+  remaining  Float
+  date       DateTime @default(now())
+  status     String   @default("active") // active | paid
+  notes      String?
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@index([employeeId])
   @@index([status])

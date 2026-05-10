@@ -19,6 +19,9 @@ import {
   Sun,
   Moon,
   KeyRound,
+  Clock,
+  CalendarCheck,
+  HandCoins,
 } from "lucide-react";
 import { ChangePasswordDialog } from "@/components/shared/change-password-dialog";
 
@@ -26,6 +29,9 @@ const navItems = [
   { href: "/dashboard", label: "لوحة التحكم", icon: LayoutDashboard, roles: ["super_admin", "city_admin", "accountant", "viewer"] },
   { href: "/inventory", label: "المخزون", icon: Package, roles: ["super_admin", "city_admin", "accountant", "viewer"] },
   { href: "/salaries", label: "المرتبات", icon: DollarSign, roles: ["super_admin", "city_admin"] },
+  { href: "/attendance", label: "الحضور والغياب", icon: Clock, roles: ["super_admin", "city_admin", "accountant"] },
+  { href: "/vacations", label: "الإجازات", icon: CalendarCheck, roles: ["super_admin", "city_admin"] },
+  { href: "/loans", label: "السلف", icon: HandCoins, roles: ["super_admin", "city_admin"] },
   { href: "/custody", label: "العهد", icon: ShieldCheck, roles: ["super_admin", "city_admin", "accountant"] },
   { href: "/expenses", label: "المصروفات", icon: Wallet, roles: ["super_admin", "city_admin", "accountant"] },
   { href: "/suppliers", label: "الموردين", icon: Users, roles: ["super_admin", "city_admin", "accountant", "viewer"] },
