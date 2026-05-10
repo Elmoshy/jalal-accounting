@@ -40,7 +40,7 @@ export default function SalariesPage() {
   const [editing, setEditing] = useState<Salary | null>(null);
   const [form, setForm] = useState({
     employeeId: "", month: new Date().getMonth() + 1, year: currentYear,
-    base: 0, bonuses: 0, deductions: 0, net: 0, paidDate: new Date().toISOString().split("T")[0], notes: "",
+    base: 0, bonuses: 0, deductions: 0, net: 0, paidDate: new Date().toISOString().split("T")[0]!, notes: "",
   });
 
   const fetchSalaries = useCallback(async () => {
@@ -73,14 +73,14 @@ export default function SalariesPage() {
       setForm({
         employeeId: emp.employeeId, month: emp.month, year: emp.year,
         base: emp.base, bonuses: emp.bonuses, deductions: emp.deductions,
-        net: emp.net, paidDate: emp.paidDate.split("T")[0] || new Date().toISOString().split("T")[0],
+        net: emp.net, paidDate: emp.paidDate.split("T")[0]! || new Date().toISOString().split("T")[0]!,
         notes: emp.notes || "",
       });
     } else {
       setForm({
         employeeId: "", month: new Date().getMonth() + 1, year: currentYear,
         base: 0, bonuses: 0, deductions: 0, net: 0,
-        paidDate: new Date().toISOString().split("T")[0], notes: "",
+        paidDate: new Date().toISOString().split("T")[0]!, notes: "",
       });
     }
   }

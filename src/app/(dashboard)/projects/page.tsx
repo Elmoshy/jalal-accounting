@@ -33,7 +33,7 @@ export default function ProjectsPage() {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   function resetForm(p?: Project | null) {
-    if (p) setForm({ name: p.name, projectLocation: p.projectLocation || "", startDate: p.startDate ? p.startDate.split("T")[0] : "", endDate: p.endDate ? p.endDate.split("T")[0] : "", status: p.status });
+    if (p) setForm({ name: p.name, projectLocation: p.projectLocation || "", startDate: p.startDate ? p.startDate.split("T")[0]! : "", endDate: p.endDate ? p.endDate.split("T")[0]! : "", status: p.status });
     else setForm({ name: "", projectLocation: "", startDate: "", endDate: "", status: "active" });
   }
 

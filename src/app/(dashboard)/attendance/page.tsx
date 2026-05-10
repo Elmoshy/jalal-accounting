@@ -26,13 +26,13 @@ export default function AttendancePage() {
   const [attendances, setAttendances] = useState<Attendance[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filterDate, setFilterDate] = useState(new Date().toISOString().split("T")[0]);
+  const [filterDate, setFilterDate] = useState(new Date().toISOString().split("T")[0]!);
   const [filterStatus, setFilterStatus] = useState("");
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Attendance | null>(null);
   const [form, setForm] = useState({
-    employeeId: "", date: new Date().toISOString().split("T")[0],
+    employeeId: "", date: new Date().toISOString().split("T")[0]!,
     checkIn: "08:00", checkOut: "16:00", status: "present", overtimeHours: 0, notes: "",
   });
 
@@ -57,14 +57,14 @@ export default function AttendancePage() {
   function resetForm(a?: Attendance | null) {
     if (a) {
       setForm({
-        employeeId: a.employeeId, date: a.date.split("T")[0],
+        employeeId: a.employeeId, date: a.date.split("T")[0]!,
         checkIn: a.checkIn ? a.checkIn.split("T")[1]?.slice(0, 5) || "08:00" : "08:00",
         checkOut: a.checkOut ? a.checkOut.split("T")[1]?.slice(0, 5) || "16:00" : "16:00",
         status: a.status, overtimeHours: a.overtimeHours, notes: a.notes || "",
       });
     } else {
       setForm({
-        employeeId: "", date: new Date().toISOString().split("T")[0],
+        employeeId: "", date: new Date().toISOString().split("T")[0]!,
         checkIn: "08:00", checkOut: "16:00", status: "present", overtimeHours: 0, notes: "",
       });
     }

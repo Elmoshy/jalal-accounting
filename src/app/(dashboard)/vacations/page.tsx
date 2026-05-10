@@ -70,7 +70,7 @@ export default function VacationsPage() {
     if (v) {
       setForm({
         employeeId: v.employeeId, type: v.type,
-        startDate: v.startDate.split("T")[0], endDate: v.endDate.split("T")[0],
+        startDate: v.startDate.split("T")[0]!, endDate: v.endDate.split("T")[0]!,
         days: v.days, status: v.status, notes: v.notes || "",
       });
     } else {

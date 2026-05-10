@@ -18,7 +18,7 @@ export default function InvoicesPage() {
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Invoice | null>(null);
-  const [form, setForm] = useState({ invNo: "", date: new Date().toISOString().split("T")[0], supplierId: "", projectId: "", subtotal: 0, tax: 0, total: 0, notes: "", items: [] as { code: string; name: string; qty: number; unit: string; price: number; total: number }[] });
+  const [form, setForm] = useState({ invNo: "", date: new Date().toISOString().split("T")[0]!, supplierId: "", projectId: "", subtotal: 0, tax: 0, total: 0, notes: "", items: [] as { code: string; name: string; qty: number; unit: string; price: number; total: number }[] });
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -65,12 +65,12 @@ export default function InvoicesPage() {
   function resetForm(inv?: Invoice | null) {
     if (inv) {
       setForm({
-        invNo: inv.invNo, date: inv.date.split("T")[0], supplierId: inv.supplier.id, projectId: "",
+        invNo: inv.invNo, date: inv.date.split("T")[0]!, supplierId: inv.supplier.id, projectId: "",
         subtotal: inv.subtotal, tax: inv.tax, total: inv.total, notes: inv.notes || "",
         items: inv.items.map((i) => ({ code: i.code, name: i.name, qty: i.qty, unit: i.unit, price: i.price, total: i.total })),
       });
     } else {
-      setForm({ invNo: "", date: new Date().toISOString().split("T")[0], supplierId: "", projectId: "", subtotal: 0, tax: 0, total: 0, notes: "", items: [] });
+      setForm({ invNo: "", date: new Date().toISOString().split("T")[0]!, supplierId: "", projectId: "", subtotal: 0, tax: 0, total: 0, notes: "", items: [] });
     }
   }
 

@@ -20,7 +20,7 @@ export default function ExpensesPage() {
   const [filterTo, setFilterTo] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Expense | null>(null);
-  const [form, setForm] = useState({ category: "petty_cash", amount: 0, description: "", date: new Date().toISOString().split("T")[0], receiptNo: "", notes: "" });
+  const [form, setForm] = useState({ category: "petty_cash", amount: 0, description: "", date: new Date().toISOString().split("T")[0]!, receiptNo: "", notes: "" });
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -36,8 +36,8 @@ export default function ExpensesPage() {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   function resetForm(e?: Expense | null) {
-    if (e) setForm({ category: e.category, amount: e.amount, description: e.description, date: e.date.split("T")[0], receiptNo: e.receiptNo || "", notes: e.notes || "" });
-    else setForm({ category: "petty_cash", amount: 0, description: "", date: new Date().toISOString().split("T")[0], receiptNo: "", notes: "" });
+    if (e) setForm({ category: e.category, amount: e.amount, description: e.description, date: e.date.split("T")[0]!, receiptNo: e.receiptNo || "", notes: e.notes || "" });
+    else setForm({ category: "petty_cash", amount: 0, description: "", date: new Date().toISOString().split("T")[0]!, receiptNo: "", notes: "" });
   }
 
   async function handleSubmit(e: React.FormEvent) {
