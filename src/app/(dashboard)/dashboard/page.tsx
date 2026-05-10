@@ -11,20 +11,22 @@ export default async function DashboardPage() {
   const { role, locationId } = session.user;
   const isAdmin = role === "super_admin";
 
-  const locationFilter = isAdmin ? {} : { locationId };
+  if (!isAdmin && !locationId) redirect("/login");
+
+  const locFilter = isAdmin ? {} : { locationId: locationId! };
 
   const [totalLocations, totalEmployees, totalSuppliers, totalProjects, totalInventoryItems, pendingCustodies] =
     await Promise.all([
       prisma.location.count({ where: { isActive: true } }),
-      prisma.employee.count({ where: { isActive: true, ...locationFilter } }),
-      prisma.supplier.count({ where: { isActive: true, ...locationFilter } }),
-      prisma.project.count({ where: { status: "active", ...locationFilter } }),
-      prisma.inventory.count({ where: { ...locationFilter } }),
-      prisma.custody.count({ where: { status: "active", ...locationFilter } }),
+      prisma.employee.count({ where: { isActive: true, ...locFilter } }),
+      prisma.supplier.count({ where: { isActive: true, ...locFilter } }),
+      prisma.project.count({ where: { status: "active", ...locFilter } }),
+      prisma.inventory.count({ where: { ...locFilter } }),
+      prisma.custody.count({ where: { status: "active", ...locFilter } }),
     ]);
 
   const recentInvoices = await prisma.invoice.findMany({
-    where: locationFilter,
+    where: locFilter,
     orderBy: { date: "desc" },
     take: 10,
     include: { supplier: { select: { name: true } } },
