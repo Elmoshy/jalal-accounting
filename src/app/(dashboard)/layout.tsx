@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
   Package,
@@ -24,6 +25,8 @@ import {
   HandCoins,
 } from "lucide-react";
 import { ChangePasswordDialog } from "@/components/shared/change-password-dialog";
+import { useMounted } from "@/hooks/use-mounted";
+import { staggerContainer, navItemVariants, springLift } from "@/lib/animations";
 
 const navItems = [
   { href: "/dashboard", label: "لوحة التحكم", icon: LayoutDashboard, roles: ["super_admin", "city_admin", "accountant", "viewer"] },
@@ -65,39 +68,63 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (!session) return null;
 
+  const mounted = useMounted();
   const userRole = session.user?.role as string;
   const visibleItems = navItems.filter((item) => item.roles.includes(userRole));
 
   return (
     <div className="flex min-h-screen">
-      <aside className="w-64 border-l bg-sidebar-background flex flex-col fixed h-full">
-        <div className="p-4 border-b">
+      <motion.aside
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4, ease: [0.21, 1.02, 0.73, 1] }}
+        className="w-64 border-l bg-sidebar-background flex flex-col fixed h-full"
+      >
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.15 }}
+          className="p-4 border-b"
+        >
           <h2 className="font-bold text-lg">جلال عثمان</h2>
           <p className="text-xs text-muted-foreground">النظام المحاسبي</p>
-        </div>
+        </motion.div>
 
-        <nav className="flex-1 overflow-y-auto p-2 space-y-1">
-          {visibleItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
-                  isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
+        <motion.nav
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="flex-1 overflow-y-auto p-2 space-y-1"
+        >
+          <AnimatePresence mode="popLayout">
+            {visibleItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+              return (
+                <motion.div key={item.href} variants={navItemVariants} layout>
+                  <Link
+                    href={item.href}
+                    className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
+                      isActive
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                        : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {item.label}
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </motion.nav>
 
-        <div className="p-4 border-t space-y-2">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="p-4 border-t space-y-2"
+        >
           <div className="flex items-center gap-3 px-3 py-2 text-sm text-muted-foreground">
             <div className="flex-1 min-w-0">
               <p className="truncate font-medium text-foreground">{session.user?.name}</p>
@@ -105,36 +132,44 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
               onClick={() => setPasswordDialogOpen(true)}
               className="flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-sidebar-accent/50 transition-colors"
               title="تغيير كلمة المرور"
             >
               <KeyRound className="h-4 w-4" />
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               className="flex-1 flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-sidebar-accent/50 transition-colors"
             >
-              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-              {theme === "dark" ? "فاتح" : "داكن"}
-            </button>
-            <button
+              {mounted && theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {mounted && theme === "dark" ? "فاتح" : "داكن"}
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
               onClick={() => signOut({ callbackUrl: "/login" })}
               className="flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-destructive/10 hover:text-destructive transition-colors"
               title="تسجيل الخروج"
             >
               <LogOut className="h-4 w-4" />
-            </button>
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
 
         <ChangePasswordDialog open={passwordDialogOpen} onClose={() => setPasswordDialogOpen(false)} />
-      </aside>
+      </motion.aside>
 
-      <main className="mr-64 flex-1 p-6">
+      <motion.main
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
+        className="mr-64 flex-1 p-6"
+      >
         {children}
-      </main>
+      </motion.main>
     </div>
   );
 }

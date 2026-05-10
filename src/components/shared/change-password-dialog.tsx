@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { KeyRound } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { modalBackdrop, modalContent } from "@/lib/animations";
 
 const passwordSchema = z
   .object({
@@ -55,65 +57,92 @@ export function ChangePasswordDialog({ open, onClose }: { open: boolean; onClose
     }
   }
 
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
-      <div className="w-full max-w-md rounded-xl border bg-card p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center gap-3 mb-4">
-          <KeyRound className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-bold">تغيير كلمة المرور</h2>
-        </div>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">كلمة المرور الحالية</label>
-            <input
-              type="password"
-              {...register("currentPassword")}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-            {errors.currentPassword && <p className="text-xs text-destructive">{errors.currentPassword.message}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">كلمة المرور الجديدة</label>
-            <input
-              type="password"
-              {...register("newPassword")}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-            {errors.newPassword && <p className="text-xs text-destructive">{errors.newPassword.message}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">تأكيد كلمة المرور الجديدة</label>
-            <input
-              type="password"
-              {...register("confirmPassword")}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-            {errors.confirmPassword && <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>}
-          </div>
-
-          <div className="flex gap-2 pt-2">
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          key="backdrop"
+          variants={modalBackdrop}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          onClick={onClose}
+        >
+          <motion.div
+            key="content"
+            variants={modalContent}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="w-full max-w-md rounded-xl border bg-card p-6 shadow-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+              className="flex items-center gap-3 mb-4"
             >
-              {loading ? "جاري الحفظ..." : "تغيير كلمة المرور"}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-md border border-input px-4 py-2 text-sm hover:bg-accent"
-            >
-              إلغاء
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+              <KeyRound className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-bold">تغيير كلمة المرور</h2>
+            </motion.div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">كلمة المرور الحالية</label>
+                <input
+                  type="password"
+                  {...register("currentPassword")}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+                {errors.currentPassword && <p className="text-xs text-destructive">{errors.currentPassword.message}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">كلمة المرور الجديدة</label>
+                <input
+                  type="password"
+                  {...register("newPassword")}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+                {errors.newPassword && <p className="text-xs text-destructive">{errors.newPassword.message}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">تأكيد كلمة المرور الجديدة</label>
+                <input
+                  type="password"
+                  {...register("confirmPassword")}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+                {errors.confirmPassword && <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>}
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <motion.button
+                  type="submit"
+                  disabled={loading}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-1 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                >
+                  {loading ? "جاري الحفظ..." : "تغيير كلمة المرور"}
+                </motion.button>
+                <motion.button
+                  type="button"
+                  onClick={onClose}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="rounded-md border border-input px-4 py-2 text-sm hover:bg-accent transition-colors"
+                >
+                  إلغاء
+                </motion.button>
+              </div>
+            </form>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
