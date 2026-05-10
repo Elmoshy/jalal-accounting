@@ -151,4 +151,3 @@ function AnimatedError({ error }: { error: string }) {
     </motion.div>
   );
 }
-}
