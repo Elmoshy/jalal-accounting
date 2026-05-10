@@ -20,8 +20,7 @@ function parseDbUrl(url: string) {
 function createAdapter() {
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error("DATABASE_URL is not set");
-  // Use explicit params (workaround for @prisma/adapter-pg SSL bug)
-  const pool = new pg.Pool(parseDbUrl(url));
+  const pool = new pg.Pool({ ...parseDbUrl(url), max: 3, idleTimeoutMillis: 10000 });
   return new PrismaPg(pool);
 }
 

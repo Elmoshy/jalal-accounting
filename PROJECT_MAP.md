@@ -26,6 +26,7 @@
 | 16. تحريك صفحة تسجيل الدخول — fadeIn card + مدخلات متحركة + سبينر دوار + error animated | `src/app/login/page.tsx` | ✅ |
 | 17. تحريك شاشة تغيير كلمة المرور — AnimatePresence + scale+fade backdrop | `src/components/shared/change-password-dialog.tsx` | ✅ |
 | 18. تحريك صفحة Placeholder — fade + slide up entrance | `src/app/(dashboard)/placeholder.tsx` | ✅ |
+| 19. نقل من Netlify لـ Vercel — حذف `netlify.toml`، تحسين `db.ts` للـ serverless (max pool connections=3)، تحديث `.env.example` | `netlify.toml` (محذوف)، `src/lib/db.ts`، `.env.example` | ✅ |
 
 ---
 
@@ -33,10 +34,11 @@
 
 | المشكلة | الخطورة | خطة المعالجة |
 |---------|---------|--------------|
-| `[YOUR-PASSWORD]` في `.env` لم يتم استبداله | **حرجة** | يلزم المستخدم وضع باسورد Supabase الحقيقي |
+| `[YOUR-PASSWORD]` في `.env` لم يتم استبداله | **حرجة** | ضعها في Vercel Environment Variables |
 | جميع `@radix-ui/*` مثبتة كـ `"latest"` | **عالية** | تثبيت الإصدارات بعد أول `npm install` ناجح |
 | لا يوجد CSRF على API routes | **متوسطة** | إضافة بعد M2 |
 | لا يوجد Rate limiting على Login | **متوسطة** | إضافة بعد M3 |
 | مجلدات `src/components/forms/`، `src/components/tables/`، `src/components/charts/` | **منخفضة** | ستنشأ عند الحاجة |
 | `src/hooks/` لا يزال به ملف واحد فقط (`use-mounted.ts`) | **منخفضة** | سيتم التوسع حسب الحاجة |
 | مكونات `src/components/ui/` فارغة (shadcn غير منشأة) | **منخفضة** | إنشاء المكونات عند الحاجة |
+| `middleware.ts` (ملف قديم في Next.js 16 — يُفضل `proxy.ts`) | **منخفضة** | تحويله لـ `proxy.ts` بعد الاستقرار |
